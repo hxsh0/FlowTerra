@@ -72,6 +72,7 @@ function makeSeedProspect(stageIdx: number, tokenIdx: number): Prospect {
 interface Props {
   onLog: (agent: string, body: LogSegment[]) => void;
   onWin: (company: string) => void;
+  onHotLead?: (company: string, stage: string) => void;
 }
 
 /**
@@ -79,7 +80,7 @@ interface Props {
  * a flying dot animates each hand-off, counts flash, and movement is reported
  * upward via onLog / onWin so the activity stream + revenue stay in sync.
  */
-export function Pipeline({ onLog, onWin }: Props) {
+export function Pipeline({ onLog, onWin, onHotLead }: Props) {
   const motion = useMotion();
   const motionRef = useRef(motion);
   motionRef.current = motion;
@@ -98,8 +99,8 @@ export function Pipeline({ onLog, onWin }: Props) {
   stagesRef.current = stages;
   const pipeRef = useRef<HTMLDivElement>(null);
   const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const cbRef = useRef<Props>({ onLog, onWin });
-  cbRef.current = { onLog, onWin };
+  const cbRef = useRef<Props>({ onLog, onWin, onHotLead });
+  cbRef.current = { onLog, onWin, onHotLead };
 
   const doFlash = (idx: number) => {
     setFlash((f) => ({ ...f, [idx]: true }));
@@ -172,6 +173,9 @@ export function Pipeline({ onLog, onWin }: Props) {
             const nt = makeProspect(tok.value, idx >= 1, tok.company);
             const tokens = [nt, ...s.tokens];
             if (tokens.length > CAP) tokens.pop();
+            if (nt.hot || idx + 1 >= 1) {
+              cbRef.current.onHotLead?.(nt.company, STAGES[idx + 1]?.name ?? "Engaged");
+            }
             return { ...s, tokens, count: s.count + 1 };
           }
           return s;
