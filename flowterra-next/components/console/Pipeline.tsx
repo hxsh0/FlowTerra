@@ -23,6 +23,38 @@ let UID = 1;
 const SEED = [5, 4, 4, 3, 2];
 const CAP = 5;
 
+/** Fixed seed cards — must match on server + client (no Math.random in useState). */
+const SEED_PROSPECTS: { company: string; value: number; hot: boolean }[][] = [
+  [
+    { company: "Northwind Labs", value: 84, hot: false },
+    { company: "Acme Systems", value: 42, hot: false },
+    { company: "Vertex Cloud", value: 156, hot: false },
+    { company: "Lumen Health", value: 28, hot: false },
+    { company: "Halcyon AI", value: 112, hot: false },
+  ],
+  [
+    { company: "Cobalt Robotics", value: 67, hot: false },
+    { company: "Meridian Group", value: 91, hot: false },
+    { company: "Atlas Foods", value: 53, hot: false },
+    { company: "Polaris Energy", value: 118, hot: false },
+  ],
+  [
+    { company: "Onyx Capital", value: 145, hot: true },
+    { company: "Kestrel Logistics", value: 72, hot: false },
+    { company: "Sable Cloud", value: 38, hot: false },
+    { company: "Quanta Systems", value: 99, hot: false },
+  ],
+  [
+    { company: "Forge AI", value: 164, hot: true },
+    { company: "Nimbus Health", value: 55, hot: false },
+    { company: "Beacon Labs", value: 88, hot: false },
+  ],
+  [
+    { company: "Ironclad Group", value: 192, hot: false },
+    { company: "Verde Energy", value: 76, hot: false },
+  ],
+];
+
 function makeProspect(value?: number, hot?: boolean, company?: string): Prospect {
   return {
     uid: UID++,
@@ -30,6 +62,11 @@ function makeProspect(value?: number, hot?: boolean, company?: string): Prospect
     value: value || rint(12, 184),
     hot: !!hot,
   };
+}
+
+function makeSeedProspect(stageIdx: number, tokenIdx: number): Prospect {
+  const seed = SEED_PROSPECTS[stageIdx][tokenIdx];
+  return { uid: UID++, ...seed };
 }
 
 interface Props {
@@ -52,7 +89,7 @@ export function Pipeline({ onLog, onWin }: Props) {
       key: s.key,
       name: s.name,
       count: s.count,
-      tokens: Array.from({ length: SEED[i] }, () => makeProspect()),
+      tokens: Array.from({ length: SEED[i] }, (_, k) => makeSeedProspect(i, k)),
     }))
   );
   const [flash, setFlash] = useState<Record<number, boolean>>({});
