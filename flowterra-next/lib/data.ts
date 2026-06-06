@@ -129,3 +129,48 @@ export const STAT_LINE = [
   { value: 11.4, prefix: "", suffix: "%", dec: 1, label: "Average reply rate" },
   { value: 9600, prefix: "", suffix: "", dec: 0, label: "SDR-hours automated /week" },
 ];
+
+export const DEFAULT_ICP_CRITERIA = [
+  { id: "size", label: "Business size", weight: 20 },
+  { id: "location", label: "Location fit", weight: 20 },
+  { id: "reviews", label: "Review volume", weight: 15 },
+  { id: "presence", label: "Online presence", weight: 15 },
+  { id: "industry", label: "Industry relevance", weight: 20 },
+  { id: "contact", label: "Contact availability", weight: 10 },
+];
+
+export const DEFAULT_NICHE = {
+  industry: "B2B SaaS",
+  location: "Austin, TX",
+  radiusKm: 50,
+  icpCriteria: DEFAULT_ICP_CRITERIA,
+};
+
+export const HOT_LEADS = [
+  { id: "hl-1", company: "Onyx Capital", icpScore: 94, source: "places" as const, stage: "Replied", status: "active" as const },
+  { id: "hl-2", company: "Forge AI", icpScore: 91, source: "places" as const, stage: "Meeting", status: "active" as const },
+  { id: "hl-3", company: "Meridian Group", icpScore: 88, source: "scraper" as const, stage: "Engaged", status: "active" as const },
+  { id: "hl-4", company: "Polaris Energy", icpScore: 86, source: "places" as const, stage: "Sourced", status: "active" as const },
+  { id: "hl-5", company: "Halcyon AI", icpScore: 84, source: "scraper" as const, stage: "Engaged", status: "active" as const },
+  { id: "hl-6", company: "Quanta Systems", icpScore: 82, source: "places" as const, stage: "Sourced", status: "active" as const },
+  { id: "hl-7", company: "Beacon Labs", icpScore: 79, source: "scraper" as const, stage: "Sourced", status: "nurture" as const },
+  { id: "hl-8", company: "Ironclad Group", icpScore: 76, source: "places" as const, stage: "Won", status: "won" as const },
+];
+
+export const DISCOVERY_SEED_LEADS = [
+  { id: "ds-1", company: "Stratos Cloud", icpScore: 92, source: "places" as const, stage: "Scored", status: "active" as const },
+  { id: "ds-2", company: "Solstice Health", icpScore: 89, source: "places" as const, stage: "Scored", status: "active" as const },
+  { id: "ds-3", company: "Brightline Ops", icpScore: 85, source: "scraper" as const, stage: "Scored", status: "active" as const },
+  { id: "ds-4", company: "Cardinal Logistics", icpScore: 81, source: "scraper" as const, stage: "Scored", status: "active" as const },
+  { id: "ds-5", company: "Tessel Analytics", icpScore: 78, source: "places" as const, stage: "Scored", status: "active" as const },
+];
+
+export const DASHBOARD_STATS = [
+  { value: 847, prefix: "", suffix: "", dec: 0, label: "Leads scraped today" },
+  { value: 73, prefix: "", suffix: "%", dec: 0, label: "ICP pass rate" },
+  { value: 18, prefix: "", suffix: "", dec: 0, label: "Meetings booked" },
+  { value: 4.2, prefix: "$", suffix: "M", dec: 1, label: "Pipeline value" },
+];
+
+export const icpWeightSum = (criteria: { weight: number }[]) =>
+  criteria.reduce((n, c) => n + c.weight, 0);
