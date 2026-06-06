@@ -65,3 +65,27 @@ export interface VisualSettings {
   density: Density;
   motion: boolean;
 }
+
+export type LeadSource = "places" | "scraper";
+
+export interface HotLead {
+  id: string;
+  company: string;
+  icpScore: number;
+  source: LeadSource;
+  stage: string;
+  status: "active" | "won" | "nurture";
+}
+
+export interface IcpCriterion {
+  id: string;
+  label: string;
+  weight: number;
+}
+
+export interface NicheConfig {
+  industry: string;
+  location: string;
+  radiusKm: number;
+  icpCriteria: IcpCriterion[];
+}
