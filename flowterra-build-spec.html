@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowTerra — Developer Build Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --forest: #0F3D2E;
+    --moss: #1D6B4E;
+    --sage: #4A9E78;
+    --mist: #A8D5B8;
+    --cream: #F7F3EE;
+    --sand: #E8E0D4;
+    --ink: #1C1A17;
+    --ink60: rgba(28,26,23,0.6);
+    --ink40: rgba(28,26,23,0.4);
+    --ink10: rgba(28,26,23,0.08);
+    --accent: #D4A853;
+    --white: #ffffff;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--forest);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .topbar-logo {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-logo span { color: var(--mist); font-style: italic; font-family: 'Playfair Display', serif; }
+  .topbar-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    background: rgba(168,213,184,0.15);
+    color: var(--mist);
+    border-radius: 100px;
+    letter-spacing: 0.4px;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 4px;
+  }
+  .topbar-nav button {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .topbar-nav button:hover { background: rgba(255,255,255,0.07); color: white; }
+  .topbar-nav button.active { background: rgba(255,255,255,0.12); color: white; font-weight: 500; }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--sand);
+    padding: 28px 0;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+  .sidebar-heading {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--ink40);
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink60);
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sidebar-item:hover { background: var(--cream); color: var(--ink); }
+  .sidebar-item.active { background: rgba(29,107,78,0.08); color: var(--moss); font-weight: 500; }
+  .sidebar-item .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .sidebar-item .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink40);
+    margin-left: auto;
+  }
+  .sidebar-divider { height: 1px; background: var(--sand); margin: 4px 20px 20px; }
+
+  /* MAIN */
+  .main { padding: 48px 56px 80px; max-width: 860px; }
+
+  /* SECTION PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* TYPOGRAPHY */
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--moss);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .section-title em { color: var(--moss); font-style: italic; }
+  .section-desc {
+    font-size: 15px;
+    color: var(--ink60);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-desc { font-size: 13px; color: var(--ink60); line-height: 1.6; margin-bottom: 16px; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #1C1A17;
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #c9c4bc;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  .code-block .key { color: #A8D5B8; }
+  .code-block .val { color: #D4A853; }
+  .code-block .str { color: #F0997B; }
+  .code-block .com { color: #5F5E5A; font-style: italic; }
+  .code-block .url { color: #85B7EB; text-decoration: underline; }
+
+  /* SPEC ROWS */
+  .spec-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--sand);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink40);
+    min-width: 120px;
+    padding-top: 1px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .spec-value { font-size: 13px; color: var(--ink); line-height: 1.55; flex: 1; }
+  .spec-value code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--cream);
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: var(--moss);
+  }
+
+  /* TAGS */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(29,107,78,0.08);
+    color: var(--moss);
+  }
+  .tag.dark { background: var(--forest); color: var(--mist); }
+  .tag.amber { background: rgba(212,168,83,0.12); color: #854F0B; }
+  .tag.red { background: rgba(226,75,74,0.08); color: #A32D2D; }
+
+  /* AGENT FLOW */
+  .agent-flow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--sand);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .agent-block {
+    background: white;
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 2px solid transparent;
+  }
+  .agent-block:hover { background: #fafaf8; }
+  .agent-block.selected { background: rgba(29,107,78,0.04); border-color: var(--sage); }
+  .agent-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink40); margin-bottom: 10px; }
+  .agent-name { font-weight: 500; font-size: 14px; color: var(--ink); margin-bottom: 4px; }
+  .agent-role { font-size: 12px; color: var(--ink60); }
+
+  .agent-detail {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 12px;
+    display: none;
+  }
+  .agent-detail.visible { display: block; }
+
+  /* PALETTE */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .swatch {
+    border-radius: 10px;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+  }
+  .swatch:hover { transform: scale(1.04); }
+  .swatch-name { font-size: 10px; font-weight: 500; }
+  .swatch-hex { font-family: 'DM Mono', monospace; font-size: 9px; opacity: 0.7; }
+  .copied-tip {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .copied-tip.show { opacity: 1; }
+
+  /* PAGE SECTIONS */
+  .page-section-list { margin: 16px 0; }
+  .page-section-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--sand);
+  }
+  .page-section-item:last-child { border-bottom: none; }
+  .psi-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink40);
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  .psi-body { flex: 1; }
+  .psi-title { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .psi-desc { font-size: 13px; color: var(--ink60); line-height: 1.55; }
+  .psi-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 100px;
+    background: rgba(212,168,83,0.12);
+    color: #854F0B;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* PRICING COMPARISON */
+  .pricing-compare {
+    display: grid;
+    grid-template-columns: 180px 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--sand);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  .pc-header { padding: 12px 16px; background: var(--cream); font-weight: 500; font-size: 12px; color: var(--ink60); }
+  .pc-header.tier { background: var(--forest); color: white; text-align: center; font-size: 13px; }
+  .pc-header.prem { background: var(--moss); }
+  .pc-row { display: contents; }
+  .pc-cell {
+    padding: 10px 16px;
+    border-top: 1px solid var(--sand);
+    color: var(--ink60);
+    font-size: 12px;
+  }
+  .pc-cell.label { color: var(--ink); font-weight: 400; background: #fafaf8; }
+  .pc-cell.check { text-align: center; color: var(--sage); font-weight: 500; }
+  .pc-cell.cross { text-align: center; color: #D3D1C7; }
+  .pc-cell.prem { text-align: center; }
+
+  /* INTEGRATION GRID */
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .integration-card {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .int-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .int-role { font-size: 12px; color: var(--ink60); margin-bottom: 10px; }
+  .int-tier { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 100px; }
+  .int-tier.both { background: rgba(29,107,78,0.08); color: var(--moss); }
+  .int-tier.premium { background: var(--forest); color: var(--mist); }
+
+  /* PROGRESS STEPS */
+  .progress-steps { margin: 20px 0; }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+  .step-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink40);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-circle.done { background: rgba(29,107,78,0.1); border-color: var(--sage); color: var(--moss); }
+  .step-body { flex: 1; padding-top: 4px; }
+  .step-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .step-desc { font-size: 12px; color: var(--ink60); line-height: 1.5; }
+  .step-connector {
+    width: 1px; height: 20px; background: var(--sand);
+    margin-left: 13px; margin-bottom: 0;
+  }
+
+  /* FOOTER */
+  .spec-footer {
+    margin-top: 60px;
+    padding-top: 28px;
+    border-top: 1px solid var(--sand);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .spec-footer p { font-size: 12px; color: var(--ink40); }
+
+  /* UTILITY */
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .mt8 { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  .mt24 { margin-top: 24px; }
+  .alert {
+    display: flex;
+    gap: 10px;
+    background: rgba(212,168,83,0.1);
+    border: 1px solid rgba(212,168,83,0.25);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+  .alert-icon { color: #854F0B; font-size: 16px; flex-shrink: 0; padding-top: 1px; }
+  .alert-text { font-size: 13px; color: #633806; line-height: 1.55; }
+  .info-box {
+    display: flex;
+    gap: 10px;
+    background: rgba(29,107,78,0.06);
+    border: 1px solid rgba(29,107,78,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+  .info-icon { color: var(--moss); font-size: 16px; flex-shrink: 0; padding-top: 1px; }
+  .info-text { font-size: 13px; color: var(--moss); line-height: 1.55; }
+
+  @media print {
+    .topbar, .sidebar { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    .panel { display: block !important; }
+    .main { padding: 20px; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    flowterra <span>— Build Spec</span>
+  </div>
+  <div class="topbar-nav">
+    <button class="active" onclick="switchTab(this,'overview')">Overview</button>
+    <button onclick="switchTab(this,'design')">Design system</button>
+    <button onclick="switchTab(this,'pages')">Pages</button>
+    <button onclick="switchTab(this,'agents')">Agents</button>
+    <button onclick="switchTab(this,'pricing')">Pricing</button>
+    <button onclick="switchTab(this,'integrations')">Integrations</button>
+    <button onclick="switchTab(this,'build')">Build order</button>
+  </div>
+  <span class="topbar-badge">v1.0 · June 2026</span>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Overview</div>
+      <button class="sidebar-item active" onclick="goTo('overview','s-what')"><span class="dot" style="background:#4A9E78"></span> What is FlowTerra</button>
+      <button class="sidebar-item" onclick="goTo('overview','s-problem')"><span class="dot" style="background:#D4A853"></span> Problem being solved</button>
+      <button class="sidebar-item" onclick="goTo('overview','s-audience')"><span class="dot" style="background:#85B7EB"></span> Target audience</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Design system</div>
+      <button class="sidebar-item" onclick="goTo('design','s-fonts')"><span class="dot" style="background:#1D6B4E"></span> Typography</button>
+      <button class="sidebar-item" onclick="goTo('design','s-colors')"><span class="dot" style="background:#F0997B"></span> Color palette</button>
+      <button class="sidebar-item" onclick="goTo('design','s-motion')"><span class="dot" style="background:#AFA9EC"></span> Motion & animation</button>
+      <button class="sidebar-item" onclick="goTo('design','s-components')"><span class="dot" style="background:#FAC775"></span> Components</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Pages</div>
+      <button class="sidebar-item" onclick="goTo('pages','s-landing')"><span class="dot" style="background:#1D9E75"></span> Landing page <span class="num">8 sec</span></button>
+      <button class="sidebar-item" onclick="goTo('pages','s-dashboard')"><span class="dot" style="background:#378ADD"></span> Dashboard <span class="num">10 sec</span></button>
+      <button class="sidebar-item" onclick="goTo('pages','s-agent1')"><span class="dot" style="background:#D85A30"></span> Agent 1 UI <span class="num">7 sec</span></button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Agents</div>
+      <button class="sidebar-item" onclick="goTo('agents','s-a1')"><span class="dot" style="background:#4A9E78"></span> Agent 1 — Discovery</button>
+      <button class="sidebar-item" onclick="goTo('agents','s-a2')"><span class="dot" style="background:#D4A853"></span> Agent 2 — Outreach</button>
+      <button class="sidebar-item" onclick="goTo('agents','s-a3')"><span class="dot" style="background:#A8D5B8"></span> Agent 3 — Booking</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Other sections</div>
+      <button class="sidebar-item" onclick="switchTab(document.querySelector('.topbar-nav button:nth-child(5)'),'pricing')"><span class="dot" style="background:#7F77DD"></span> Pricing tiers</button>
+      <button class="sidebar-item" onclick="switchTab(document.querySelector('.topbar-nav button:nth-child(6)'),'integrations')"><span class="dot" style="background:#D85A30"></span> Integrations</button>
+      <button class="sidebar-item" onclick="switchTab(document.querySelector('.topbar-nav button:nth-child(7)'),'build')"><span class="dot" style="background:#888780"></span> Build order</button>
+    </div>
+
+  </nav>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+
+      <div id="s-what">
+        <p class="section-eyebrow">Product overview</p>
+        <h1 class="section-title">FlowTerra — <em>what we're building</em></h1>
+        <p class="section-desc">An AI-powered B2B lead generation and outreach platform. Three autonomous agents work in sequence to scrape, qualify, message, and book meetings — with no manual involvement required from the client's sales team.</p>
+
+        <div class="card">
+          <div class="card-title">Core value proposition</div>
+          <div class="card-desc">Most lead gen tools create volume — not quality. FlowTerra's differentiator is that the Premium tier's Agent 3 <strong>gatekeeps the calendar</strong>: no weak lead books a call. Sales reps only show up to conversations worth having.</div>
+          <div class="tag-row">
+            <span class="tag dark">Agentic AI</span>
+            <span class="tag dark">B2B outreach</span>
+            <span class="tag dark">Niche-agnostic</span>
+            <span class="tag dark">Done-for-you</span>
+          </div>
+        </div>
+
+        <div class="card mt8">
+          <div class="card-title">Three-agent architecture</div>
+          <div class="card-desc">The platform is structured around three sequential AI agents, each with a distinct role in the pipeline.</div>
+          <div class="agent-flow">
+            <div class="agent-block selected" onclick="selectAgent(this, 'a1-detail')">
+              <div class="agent-num">01</div>
+              <div class="agent-name">Discovery</div>
+              <div class="agent-role">Scrape & score leads</div>
+            </div>
+            <div class="agent-block" onclick="selectAgent(this, 'a2-detail')">
+              <div class="agent-num">02</div>
+              <div class="agent-name">Outreach</div>
+              <div class="agent-role">SMS sequences</div>
+            </div>
+            <div class="agent-block" onclick="selectAgent(this, 'a3-detail')">
+              <div class="agent-num">03</div>
+              <div class="agent-name">Booking</div>
+              <div class="agent-role">Qualify & book</div>
+            </div>
+          </div>
+
+          <div class="agent-detail visible" id="a1-detail">
+            <div class="spec-row"><div class="spec-label">Role</div><div class="spec-value">Scrapes Google Places API (primary) and web scraper fallback. Enriches leads via Apollo.io. Scores each lead across 6 custom-weighted ICP criteria.</div></div>
+            <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Scored lead list passed to Agent 2. Only leads above ICP threshold proceed.</div></div>
+            <div class="spec-row"><div class="spec-label">Tech</div><div class="spec-value"><code>Google Places API</code> <code>Apollo.io</code> <code>Make.com</code> <code>GHL CRM</code></div></div>
+            <div class="spec-row"><div class="spec-label">UI built</div><div class="spec-value"><span class="tag" style="font-size:11px">✓ Complete — dual source, ICP weight editor, live progress</span></div></div>
+          </div>
+
+          <div class="agent-detail" id="a2-detail">
+            <div class="spec-row"><div class="spec-label">Role</div><div class="spec-value">Runs personalised multi-step SMS sequences. Adapts timing based on response behaviour. Handles follow-ups automatically.</div></div>
+            <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Engaged leads (replied, clicked, or expressed intent) passed to Agent 3.</div></div>
+            <div class="spec-row"><div class="spec-label">Tech</div><div class="spec-value"><code>Twilio SMS</code> <code>LeadConnector</code> <code>OpenRouter → Claude Sonnet</code> <code>GHL</code></div></div>
+            <div class="spec-row"><div class="spec-label">UI built</div><div class="spec-value"><span class="tag amber">⬤ Next to build — Agent 2 UI</span></div></div>
+          </div>
+
+          <div class="agent-detail" id="a3-detail">
+            <div class="spec-row"><div class="spec-label">Role</div><div class="spec-value">Manages live conversations with AI. Qualifies intent. Blocks weak leads. Books meetings directly to calendar for leads that pass threshold.</div></div>
+            <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Booked calendar appointments for qualified leads only. Follow-up nurture for warm-but-not-ready leads.</div></div>
+            <div class="spec-row"><div class="spec-label">Tech</div><div class="spec-value"><code>OpenRouter → Claude Sonnet</code> <code>Google Calendar</code> <code>Calendly</code> <code>GHL</code></div></div>
+            <div class="spec-row"><div class="spec-label">UI built</div><div class="spec-value"><span class="tag red">○ Not yet started</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s-problem" style="margin-top: 48px;">
+        <p class="section-eyebrow">Problem statement</p>
+        <h2 class="section-title">The problem we're <em>solving</em></h2>
+
+        <div class="alert">
+          <div class="alert-icon">⚠</div>
+          <div class="alert-text"><strong>Core business risk:</strong> Without strong lead qualification, the platform floods sales teams with calls that cannot convert. This wastes rep time, creates churn, and undermines trust in the product. The Premium tier's entire value is in preventing this.</div>
+        </div>
+
+        <div class="card">
+          <div class="spec-row"><div class="spec-label">Problem</div><div class="spec-value">Traditional outreach tools optimise for volume. High quantity of leads ≠ high quality of booked calls.</div></div>
+          <div class="spec-row"><div class="spec-label">Impact</div><div class="spec-value">Sales reps waste time on calls with leads who cannot buy, are outside the target market, or have low intent.</div></div>
+          <div class="spec-row"><div class="spec-label">Solution</div><div class="spec-value">Agent 3 acts as a gatekeeper. It manages the conversation, assesses intent, and only books calls that meet the client's ICP threshold. Standard tier users qualify manually.</div></div>
+          <div class="spec-row"><div class="spec-label">Messaging</div><div class="spec-value">"Only pay for leads worth showing up to" — this line should be prominent in hero, pricing, and any sales collateral.</div></div>
+        </div>
+      </div>
+
+      <div id="s-audience" style="margin-top: 48px;">
+        <p class="section-eyebrow">Audience</p>
+        <h2 class="section-title">Who we're <em>building for</em></h2>
+
+        <div class="card">
+          <div class="card-title">Primary buyer</div>
+          <div class="card-desc">B2B business owners or sales leads who run outbound sales and want to remove manual prospecting from the equation.</div>
+          <div class="spec-row" style="border-top: 1px solid var(--sand); margin-top: 12px; padding-top: 12px;"><div class="spec-label">Examples</div><div class="spec-value">HVAC companies, digital agencies, SaaS sales teams, facilities management, local service businesses scaling outbound</div></div>
+          <div class="spec-row"><div class="spec-label">Pain point</div><div class="spec-value">Too much time on prospecting and cold outreach. Not enough time on closing.</div></div>
+          <div class="spec-row"><div class="spec-label">Purchase trigger</div><div class="spec-value">Tired of wasted sales calls. Want predictable pipeline without hiring more SDRs.</div></div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-icon">ℹ</div>
+          <div class="info-text">The platform is <strong>niche-agnostic</strong> — it should work for any B2B vertical. The niche configurator on the dashboard lets clients set their target industry, location, and ICP weights. Build all UI with configurability in mind, not hardcoded to any single vertical.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DESIGN SYSTEM -->
+    <div class="panel" id="panel-design">
+
+      <p class="section-eyebrow">Design system</p>
+      <h1 class="section-title">Visual language & <em>components</em></h1>
+      <p class="section-desc">All UI must follow this system exactly. Consistency across pages is critical. Do not introduce new colors, fonts, or radius values without approval.</p>
+
+      <div id="s-fonts">
+        <div class="card">
+          <div class="card-title">Typography</div>
+          <div class="card-desc">Two fonts only. Loaded from Google Fonts.</div>
+          <div class="spec-row"><div class="spec-label">Display font</div><div class="spec-value" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#0F3D2E;">Playfair Display</div></div>
+          <div class="spec-row"><div class="spec-label">Usage</div><div class="spec-value">All headings (H1, H2, H3), price figures, hero titles. Use italic weight for emphasis words within headings.</div></div>
+          <div class="spec-row"><div class="spec-label">Body font</div><div class="spec-value" style="font-family:'DM Sans',sans-serif;font-size:16px;">DM Sans — navigation, body copy, labels, buttons, tags</div></div>
+          <div class="spec-row"><div class="spec-label">Mono font</div><div class="spec-value" style="font-family:'DM Mono',monospace;font-size:13px;color:#1D6B4E;">DM Mono — code snippets, numeric counters, ICP scores, live data readouts</div></div>
+          <div class="spec-row"><div class="spec-label">Import</div><div class="spec-value"><code>fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500</code></div></div>
+        </div>
+      </div>
+
+      <div id="s-colors" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Color palette — click any swatch to copy hex</div>
+          <div class="card-desc">Forest green is the primary brand color. Cream is the page background. Never use pure white as a page background.</div>
+          <div class="palette-grid">
+            <div class="swatch" style="background:#0F3D2E;" onclick="copyHex(this,'#0F3D2E')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#A8D5B8;">Forest</div>
+              <div class="swatch-hex" style="color:#A8D5B8;">#0F3D2E</div>
+            </div>
+            <div class="swatch" style="background:#1D6B4E;" onclick="copyHex(this,'#1D6B4E')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#A8D5B8;">Moss</div>
+              <div class="swatch-hex" style="color:#A8D5B8;">#1D6B4E</div>
+            </div>
+            <div class="swatch" style="background:#4A9E78;" onclick="copyHex(this,'#4A9E78')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:white;">Sage</div>
+              <div class="swatch-hex" style="color:white;">#4A9E78</div>
+            </div>
+            <div class="swatch" style="background:#A8D5B8;" onclick="copyHex(this,'#A8D5B8')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#085041;">Mist</div>
+              <div class="swatch-hex" style="color:#085041;">#A8D5B8</div>
+            </div>
+            <div class="swatch" style="background:#F7F3EE;border:1px solid #E8E0D4;" onclick="copyHex(this,'#F7F3EE')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#888780;">Cream</div>
+              <div class="swatch-hex" style="color:#888780;">#F7F3EE</div>
+            </div>
+            <div class="swatch" style="background:#E8E0D4;" onclick="copyHex(this,'#E8E0D4')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#5F5E5A;">Sand</div>
+              <div class="swatch-hex" style="color:#5F5E5A;">#E8E0D4</div>
+            </div>
+            <div class="swatch" style="background:#1C1A17;" onclick="copyHex(this,'#1C1A17')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#888780;">Ink</div>
+              <div class="swatch-hex" style="color:#888780;">#1C1A17</div>
+            </div>
+            <div class="swatch" style="background:#D4A853;" onclick="copyHex(this,'#D4A853')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#412402;">Accent</div>
+              <div class="swatch-hex" style="color:#412402;">#D4A853</div>
+            </div>
+            <div class="swatch" style="background:#ffffff;border:1px solid #E8E0D4;" onclick="copyHex(this,'#ffffff')">
+              <div class="copied-tip">Copied!</div>
+              <div class="swatch-name" style="color:#888780;">White</div>
+              <div class="swatch-hex" style="color:#888780;">#ffffff</div>
+            </div>
+          </div>
+
+          <div class="spec-row" style="border-top:1px solid var(--sand);margin-top:8px;padding-top:16px;">
+            <div class="spec-label">Page bg</div>
+            <div class="spec-value">Always <code>#F7F3EE</code> (Cream). Never pure white.</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">Card bg</div>
+            <div class="spec-value"><code>#ffffff</code> on cream sections. <code>rgba(255,255,255,0.06)</code> on dark (Forest) sections.</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">Dark sections</div>
+            <div class="spec-value"><code>#0F3D2E</code> background for feature sections and hero-right. Text: white at various opacities (90%, 55%, 35%).</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">Borders</div>
+            <div class="spec-value"><code>rgba(28,26,23,0.08)</code> on light sections. <code>rgba(255,255,255,0.12)</code> on dark sections.</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">Border radius</div>
+            <div class="spec-value">Cards: <code>16–20px</code>. Buttons: <code>100px</code> (pill). Badges/tags: <code>100px</code>. Inner elements: <code>10–12px</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s-motion" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Motion & animation</div>
+          <div class="card-desc">All animations are CSS-only unless a JS library is specifically required. Keep motion purposeful — no decorative spinning or bouncing.</div>
+          <div class="spec-row"><div class="spec-label">Live dot</div><div class="spec-value">Pulsing dot for "live" status indicators. <code>opacity 1→0.3→1</code>, <code>1.5s ease-in-out infinite</code></div></div>
+          <div class="spec-row"><div class="spec-label">Ticker tape</div><div class="spec-value">Horizontal scrolling stats bar below nav. <code>translateX(0 → -50%)</code>, <code>18s linear infinite</code>. Duplicate content to loop seamlessly.</div></div>
+          <div class="spec-row"><div class="spec-label">Progress bar</div><div class="spec-value">Pipeline health bar in hero card. <code>width 62%→82%</code>, <code>3s ease-in-out infinite alternate</code></div></div>
+          <div class="spec-row"><div class="spec-label">Page load</div><div class="spec-value">Stagger hero elements with <code>animation-delay</code>: eyebrow (0ms), title (80ms), subtitle (160ms), CTA (240ms), stats (320ms).</div></div>
+          <div class="spec-row"><div class="spec-label">Hover states</div><div class="spec-value">All interactive elements: <code>transition: all 0.15s ease</code>. Sidebar items lighten. Agent blocks get border accent. Buttons darken slightly.</div></div>
+          <div class="spec-row"><div class="spec-label">Scrape progress</div><div class="spec-value">Agent 1 UI has multi-step animated progress flow. Each step reveals sequentially. Use JS timer or CSS animation-delay chain.</div></div>
+        </div>
+      </div>
+
+      <div id="s-components" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Component library</div>
+          <div class="card-desc">Reusable patterns used across all pages. Build these as components first.</div>
+          <div class="spec-row"><div class="spec-label">Eyebrow</div><div class="spec-value">Small caps label above section titles. <code>11px, 500 weight, #1D6B4E, letter-spacing 0.8px, uppercase</code></div></div>
+          <div class="spec-row"><div class="spec-label">Pill badge</div><div class="spec-value">Rounded pill with dot indicator. Used for "Live", "Standard", "Premium", "Most popular" labels.</div></div>
+          <div class="spec-label" style="margin-top:12px;">Buttons</div>
+          <div class="spec-row"><div class="spec-label">Primary</div><div class="spec-value">Forest bg (#0F3D2E), white text, pill radius, 14–15px, 500 weight. Hover: slightly lighter.</div></div>
+          <div class="spec-row"><div class="spec-label">Secondary</div><div class="spec-value">Transparent bg, Forest border (1px, 25% opacity), Forest text. Same size.</div></div>
+          <div class="spec-row"><div class="spec-label">Premium CTA</div><div class="spec-value">Sage bg (#4A9E78), white text. Used only on Premium pricing card.</div></div>
+          <div class="spec-row"><div class="spec-label">Stat card</div><div class="spec-value">Playfair Display number (28px, 700), DM Sans label below (12px, rgba opacity). Used in hero stats row and dashboard.</div></div>
+          <div class="spec-row"><div class="spec-label">ICP tag</div><div class="spec-value">Small pill. <code>rgba(29,107,78,0.07)</code> bg, <code>#1D6B4E</code> text, 11px, 500 weight.</div></div>
+          <div class="spec-row"><div class="spec-label">Dark card</div><div class="spec-value">On Forest sections: <code>rgba(15,61,46,0.9)</code> bg, <code>rgba(255,255,255,0.12)</code> border, 16px radius.</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PAGES -->
+    <div class="panel" id="panel-pages">
+
+      <p class="section-eyebrow">Pages</p>
+      <h1 class="section-title">Page-by-page <em>breakdown</em></h1>
+      <p class="section-desc">The full website consists of a marketing landing page and an app dashboard. Below is the section-by-section breakdown of each.</p>
+
+      <div id="s-landing">
+        <div class="card">
+          <div class="card-title">Landing page — sections in order</div>
+          <div class="card-desc">Single scrolling page. All sections stacked vertically. No sub-pages needed for V1.</div>
+
+          <div class="page-section-list">
+            <div class="page-section-item">
+              <div class="psi-num">01</div>
+              <div class="psi-body">
+                <div class="psi-title">Navigation bar <span class="psi-badge">Sticky</span></div>
+                <div class="psi-desc">Logo left. Nav links centre (Platform, Agents, Pricing, Case studies). CTA button right ("Get started free"). Sticky on scroll. Background: Cream. Bottom border: 1px Sand.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">02</div>
+              <div class="psi-body">
+                <div class="psi-title">Ticker tape <span class="psi-badge">Animated</span></div>
+                <div class="psi-desc">Horizontal scrolling bar below nav. Moss background. Rotating live stats: leads scraped, ICP accuracy, meetings booked, team count, pipeline growth. Infinite loop.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">03</div>
+              <div class="psi-body">
+                <div class="psi-title">Hero — split layout</div>
+                <div class="psi-desc">Left: eyebrow pill, H1 title (Playfair, 54px), subtitle, two CTA buttons, three stat figures. Right: Forest green panel with live pipeline card showing all 3 agents running. Animated progress bar.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">04</div>
+              <div class="psi-body">
+                <div class="psi-title">Three agents section</div>
+                <div class="psi-desc">Section title. Three equal-width cards in a grid (separated by 2px Sand gaps, no outer border). Each card: numbered label, icon, name, description, tech stack tags.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">05</div>
+              <div class="psi-body">
+                <div class="psi-title">Features section <span class="psi-badge">Dark bg</span></div>
+                <div class="psi-desc">Full-width Forest green background. 2×2 feature card grid. Cards: Niche-configurable, Always-on agents, Live funnel visibility, Plugs into your stack.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">06</div>
+              <div class="psi-body">
+                <div class="psi-title">Social proof / testimonials</div>
+                <div class="psi-desc">Three testimonial cards side by side. Each: italic quote (Playfair), author avatar (initials circle), name, role, company. White cards on Cream background.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">07</div>
+              <div class="psi-body">
+                <div class="psi-title">Pricing section</div>
+                <div class="psi-desc">Two-tier layout. Standard ($297/mo) left, Premium ($797/mo) right on Forest bg. See Pricing tab for full spec.</div>
+              </div>
+            </div>
+            <div class="page-section-item">
+              <div class="psi-num">08</div>
+              <div class="psi-body">
+                <div class="psi-title">CTA section + footer</div>
+                <div class="psi-desc">Dark Ink (#1C1A17) full-width section. Large Playfair headline. Two buttons. Footer below: logo left, copyright right, same dark bg.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s-dashboard" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">App dashboard — main sections</div>
+          <div class="card-desc">The logged-in product dashboard. Dark design system (matching FlowTerra brand). Sidebar navigation + main content area.</div>
+          <div class="spec-row"><div class="spec-label">Layout</div><div class="spec-value">Sidebar left (260px) + main content. Sticky sidebar. Full-height layout.</div></div>
+          <div class="spec-row"><div class="spec-label">Sections</div><div class="spec-value">Three-agent pipeline visualisation, stat cards, funnel view, hot leads table with ICP score bars, agent status panel with live indicators, live activity feed, niche configurator modal.</div></div>
+          <div class="spec-row"><div class="spec-label">Status</div><div class="spec-value"><span class="tag">✓ Built — main dashboard complete</span></div></div>
+        </div>
+      </div>
+
+      <div id="s-agent1" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Agent 1 UI — discovery page</div>
+          <div class="card-desc">Dedicated page for Agent 1 controls and live output. Accessible from dashboard sidebar.</div>
+          <div class="spec-row"><div class="spec-label">Data sources</div><div class="spec-value">Dual-source toggle: Google Places API (primary) + web scraper (fallback). Source badges on each lead row.</div></div>
+          <div class="spec-row"><div class="spec-label">ICP scoring</div><div class="spec-value">6 editable weighted criteria. Weights must sum to 100% (live validation). Custom labels per criterion.</div></div>
+          <div class="spec-row"><div class="spec-label">Scrape flow</div><div class="spec-value">Multi-step animated progress: Initialising → Fetching sources → Scoring leads → Enriching via Apollo → Complete.</div></div>
+          <div class="spec-row"><div class="spec-label">Status</div><div class="spec-value"><span class="tag">✓ Built — complete</span></div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AGENTS -->
+    <div class="panel" id="panel-agents">
+
+      <p class="section-eyebrow">Agent architecture</p>
+      <h1 class="section-title">Three agents, <em>one pipeline</em></h1>
+      <p class="section-desc">Each agent has a defined input, process, and output. They run sequentially. Agent 3 (Premium only) is the quality gate that solves the weak-leads problem.</p>
+
+      <div id="s-a1">
+        <div class="card">
+          <div class="card-title">Agent 1 — Discovery</div>
+          <div class="card-desc">Finds and scores leads matching the client's ICP. Runs on-demand or on a schedule.</div>
+          <div class="spec-row"><div class="spec-label">Input</div><div class="spec-value">Niche config (business type, location, radius). ICP weights set by client.</div></div>
+          <div class="spec-row"><div class="spec-label">Primary source</div><div class="spec-value">Google Places API — returns business name, address, phone, category, rating, review count.</div></div>
+          <div class="spec-row"><div class="spec-label">Fallback source</div><div class="spec-value">Web scraper (Make.com workflow) — activates when Places API returns insufficient results.</div></div>
+          <div class="spec-row"><div class="spec-label">Enrichment</div><div class="spec-value">Apollo.io — adds employee count, LinkedIn URL, email, revenue estimate, tech stack signals.</div></div>
+          <div class="spec-row"><div class="spec-label">ICP scoring</div><div class="spec-value">6 criteria, client-editable weights (must sum to 100%). Score: 0–100. Threshold configurable. Leads below threshold are filtered out.</div></div>
+          <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Scored lead list stored in GHL CRM. Passed to Agent 2 automatically.</div></div>
+
+          <div class="code-block" style="margin-top:16px;">
+<span class="com">// ICP scoring criteria (example — all editable in UI)</span>
+<span class="key">criteria</span>: [
+  { <span class="key">label</span>: <span class="str">"Business size"</span>,        <span class="key">weight</span>: <span class="val">20</span> },
+  { <span class="key">label</span>: <span class="str">"Location fit"</span>,          <span class="key">weight</span>: <span class="val">20</span> },
+  { <span class="key">label</span>: <span class="str">"Review volume"</span>,         <span class="key">weight</span>: <span class="val">15</span> },
+  { <span class="key">label</span>: <span class="str">"Online presence"</span>,       <span class="key">weight</span>: <span class="val">15</span> },
+  { <span class="key">label</span>: <span class="str">"Industry relevance"</span>,    <span class="key">weight</span>: <span class="val">20</span> },
+  { <span class="key">label</span>: <span class="str">"Contact availability"</span>,  <span class="key">weight</span>: <span class="val">10</span> }
+]  <span class="com">// weights must sum to 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s-a2" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Agent 2 — Outreach <span class="psi-badge" style="margin-left:8px;">UI: Next to build</span></div>
+          <div class="card-desc">Runs multi-step SMS outreach sequences on leads passed from Agent 1. Handles timing, personalisation, and follow-ups automatically.</div>
+          <div class="spec-row"><div class="spec-label">Input</div><div class="spec-value">Scored lead list from Agent 1 (above ICP threshold only).</div></div>
+          <div class="spec-row"><div class="spec-label">SMS provider</div><div class="spec-value">Twilio (client's own account) or LeadConnector (via GHL). Per-message cost: $0.0125/segment.</div></div>
+          <div class="spec-row"><div class="spec-label">AI layer</div><div class="spec-value">OpenRouter → Claude Sonnet (<code>anthropic/claude-sonnet-4</code>). Generates personalised message copy per lead. Cost: $0.018/AI response.</div></div>
+          <div class="spec-row"><div class="spec-label">Sequence</div><div class="spec-value">Multi-step: initial message → follow-up 1 (Day 2) → follow-up 2 (Day 5) → final (Day 9). Each step personalised. Sequence pauses on reply.</div></div>
+          <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Replied/engaged leads flagged and passed to Agent 3. Non-responders stay in nurture.</div></div>
+
+          <div class="info-box" style="margin-top:16px;">
+            <div class="info-icon">ℹ</div>
+            <div class="info-text">Agent 2 UI needs: sequence builder (step editor, delay settings, message template with AI generation), live outreach stats panel, per-lead status tracker (sent / delivered / replied / opted out).</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s-a3" style="margin-top: 32px;">
+        <div class="card">
+          <div class="card-title">Agent 3 — Booking & qualification <span class="psi-badge" style="margin-left:8px;">Premium only</span></div>
+          <div class="card-desc">The quality gate. Manages live AI conversations with engaged leads. Qualifies intent before booking. Blocks weak leads from reaching the calendar.</div>
+
+          <div class="alert">
+            <div class="alert-icon">⚠</div>
+            <div class="alert-text"><strong>This is the core differentiator.</strong> Without Agent 3, clients receive raw responses and must qualify manually — leading to wasted calls. Agent 3's blocking logic must be prominently explained in UI and marketing copy.</div>
+          </div>
+
+          <div class="spec-row"><div class="spec-label">Input</div><div class="spec-value">Engaged leads (replied to Agent 2) passed automatically.</div></div>
+          <div class="spec-row"><div class="spec-label">AI engine</div><div class="spec-value">OpenRouter → Claude Sonnet. Handles objections, asks qualifying questions, assesses intent and fit.</div></div>
+          <div class="spec-row"><div class="spec-label">Qualification</div><div class="spec-value">Agent evaluates: budget signal, decision-maker status, timeline, service fit. Leads that don't pass are tagged "nurture" — not booked.</div></div>
+          <div class="spec-row"><div class="spec-label">Booking</div><div class="spec-value">Qualified leads: Agent books directly via Google Calendar API or Calendly embed. Sends confirmation SMS.</div></div>
+          <div class="spec-row"><div class="spec-label">CRM sync</div><div class="spec-value">All conversation data, qualification score, and booking status synced to GHL. GHL triggers follow-up automations.</div></div>
+          <div class="spec-row"><div class="spec-label">Output</div><div class="spec-value">Booked calendar appointments for qualified leads only. Nurture sequence for warm-but-not-ready leads.</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PRICING -->
+    <div class="panel" id="panel-pricing">
+
+      <p class="section-eyebrow">Pricing</p>
+      <h1 class="section-title">Two tiers — <em>Standard & Premium</em></h1>
+      <p class="section-desc">Pricing is deliberately simple: two tiers, clear outcome difference. The upgrade from Standard to Premium is not about "more features" — it's about eliminating wasted calls entirely.</p>
+
+      <div class="card">
+        <div class="card-title">Tier overview</div>
+        <div class="pricing-compare">
+          <div class="pc-header">Feature</div>
+          <div class="pc-header tier">Standard — $297/mo</div>
+          <div class="pc-header tier prem">Premium — $797/mo</div>
+
+          <div class="pc-cell label">Lead scraping</div>
+          <div class="pc-cell check">✓ Up to 1,500/mo</div>
+          <div class="pc-cell check">✓ Up to 5,000/mo</div>
+
+          <div class="pc-cell label">Google Places API</div>
+          <div class="pc-cell check">✓</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">Web scraper fallback</div>
+          <div class="pc-cell check">✓</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">ICP scoring (6 criteria)</div>
+          <div class="pc-cell check">✓</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">SMS outreach sequences</div>
+          <div class="pc-cell check">✓ Via Twilio</div>
+          <div class="pc-cell check">✓ Via Twilio</div>
+
+          <div class="pc-cell label">Live funnel dashboard</div>
+          <div class="pc-cell check">✓</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">Apollo.io enrichment</div>
+          <div class="pc-cell cross">—</div>
+          <div class="pc-cell check">✓ All leads</div>
+
+          <div class="pc-cell label">AI conversation (Agent 3)</div>
+          <div class="pc-cell cross">—</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">Lead quality gating</div>
+          <div class="pc-cell cross">— Manual</div>
+          <div class="pc-cell check">✓ Automated</div>
+
+          <div class="pc-cell label">Auto calendar booking</div>
+          <div class="pc-cell cross">—</div>
+          <div class="pc-cell check">✓ Google / Calendly</div>
+
+          <div class="pc-cell label">GHL CRM sync</div>
+          <div class="pc-cell cross">—</div>
+          <div class="pc-cell check">✓</div>
+
+          <div class="pc-cell label">Setup</div>
+          <div class="pc-cell" style="text-align:center;font-size:12px;color:var(--ink60);">One-time fee</div>
+          <div class="pc-cell" style="text-align:center;font-size:12px;color:var(--ink60);">Included</div>
+
+          <div class="pc-cell label">Usage billing</div>
+          <div class="pc-cell" style="text-align:center;font-size:11px;color:var(--ink60);">$0.018/AI · $0.0125/SMS</div>
+          <div class="pc-cell" style="text-align:center;font-size:11px;color:var(--ink60);">$0.018/AI · $0.0125/SMS</div>
+        </div>
+      </div>
+
+      <div class="card mt16">
+        <div class="card-title">Key copy — must use on pricing page</div>
+        <div class="spec-row"><div class="spec-label">Section H2</div><div class="spec-value">"Only pay for leads worth showing up to"</div></div>
+        <div class="spec-row"><div class="spec-label">Premium callout</div><div class="spec-value">"Agent 3 filters every lead conversation before booking. If they don't meet your ICP threshold, they never reach your calendar."</div></div>
+        <div class="spec-row"><div class="spec-label">Standard pitch</div><div class="spec-value">"The infrastructure to find and reach your ICP at scale. You stay in control of qualification."</div></div>
+        <div class="spec-row"><div class="spec-label">Fine print</div><div class="spec-value">"Both plans include a one-time setup fee. Usage billed at $0.018/AI response · $0.0125/SMS segment via your Twilio account. No long-term contracts. Cancel anytime."</div></div>
+      </div>
+
+      <div class="card mt16">
+        <div class="card-title">Visual treatment</div>
+        <div class="spec-row"><div class="spec-label">Standard card</div><div class="spec-value">White background, Forest border (1px), standard layout. Cross-out items for what's not included.</div></div>
+        <div class="spec-row"><div class="spec-label">Premium card</div><div class="spec-value">Forest background (#0F3D2E), white text. Sage CTA button. Highlighted callout box for the quality gate feature.</div></div>
+        <div class="spec-row"><div class="spec-label">Layout</div><div class="spec-value">Side by side on desktop. Stack vertically on mobile (Premium first on mobile).</div></div>
+      </div>
+
+    </div>
+
+    <!-- INTEGRATIONS -->
+    <div class="panel" id="panel-integrations">
+
+      <p class="section-eyebrow">Tech stack</p>
+      <h1 class="section-title">Integrations & <em>infrastructure</em></h1>
+      <p class="section-desc">FlowTerra is a glue platform — it orchestrates third-party services rather than building everything from scratch. Below is the full integration map.</p>
+
+      <div class="card">
+        <div class="card-title">Integration map</div>
+        <div class="integration-grid">
+          <div class="integration-card">
+            <div class="int-name">Google Places API</div>
+            <div class="int-role">Primary lead source. Returns business listings by location + category.</div>
+            <div class="int-tier both">Both tiers</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Web scraper</div>
+            <div class="int-role">Fallback data source via Make.com workflow when Places returns thin results.</div>
+            <div class="int-tier both">Both tiers</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Apollo.io</div>
+            <div class="int-role">Lead enrichment. Adds employee count, email, LinkedIn, revenue signals.</div>
+            <div class="int-tier premium">Premium only</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Twilio</div>
+            <div class="int-role">SMS delivery. Client uses own Twilio account. $0.0125/segment.</div>
+            <div class="int-tier both">Both tiers</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">LeadConnector</div>
+            <div class="int-role">GHL-native SMS/email channel. Alternative to raw Twilio for GHL users.</div>
+            <div class="int-tier both">Both tiers</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">OpenRouter</div>
+            <div class="int-role">Routes AI calls to Claude Sonnet (anthropic/claude-sonnet-4). $0.018/response.</div>
+            <div class="int-tier premium">Premium — Agent 3</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">GoHighLevel (GHL)</div>
+            <div class="int-role">CRM backbone. Stores all lead data, triggers automations, manages pipeline stages.</div>
+            <div class="int-tier premium">Premium</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Make.com</div>
+            <div class="int-role">Automation/workflow layer. Powers scraping workflows and GHL triggers.</div>
+            <div class="int-tier both">Both tiers</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Google Calendar</div>
+            <div class="int-role">Primary booking target. Agent 3 creates calendar events directly via API.</div>
+            <div class="int-tier premium">Premium — Agent 3</div>
+          </div>
+          <div class="integration-card">
+            <div class="int-name">Calendly</div>
+            <div class="int-role">Alternative booking option. Agent 3 sends Calendly link or uses API to book.</div>
+            <div class="int-tier premium">Premium — Agent 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt16">
+        <div class="card-title">API payload reference — OpenRouter</div>
+        <div class="card-desc">Agent 2 and Agent 3 both call OpenRouter to generate and manage AI responses.</div>
+        <div class="code-block">
+<span class="com">// OpenRouter API call from Agent 2/3</span>
+POST <span class="url">https://openrouter.ai/api/v1/chat/completions</span>
+
+{
+  <span class="key">"model"</span>: <span class="str">"anthropic/claude-sonnet-4"</span>,
+  <span class="key">"messages"</span>: [
+    { <span class="key">"role"</span>: <span class="str">"system"</span>, <span class="key">"content"</span>: <span class="str">"[agent system prompt]"</span> },
+    { <span class="key">"role"</span>: <span class="str">"user"</span>,   <span class="key">"content"</span>: <span class="str">"[lead context + conversation history]"</span> }
+  ],
+  <span class="key">"max_tokens"</span>: <span class="val">500</span>
+}
+
+<span class="com">// Webhook from GHL triggers the call when a lead replies via SMS</span>
+<span class="com">// Response text is sent back as next SMS via Twilio/LeadConnector</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BUILD ORDER -->
+    <div class="panel" id="panel-build">
+
+      <p class="section-eyebrow">Implementation</p>
+      <h1 class="section-title">Build order & <em>priorities</em></h1>
+      <p class="section-desc">Recommended sequence for the developer. UI components are built component-by-component. Backend integrations follow UI completion.</p>
+
+      <div class="card">
+        <div class="card-title">What's already built</div>
+        <div class="tag-row mt8">
+          <span class="tag">✓ Main dashboard</span>
+          <span class="tag">✓ Agent 1 UI</span>
+          <span class="tag">✓ Landing page (visual)</span>
+          <span class="tag">✓ Pricing section (visual)</span>
+          <span class="tag">✓ Design system established</span>
+        </div>
+      </div>
+
+      <div class="card mt16">
+        <div class="card-title">Recommended build order</div>
+
+        <div class="progress-steps">
+
+          <div class="step-item">
+            <div class="step-circle done">✓</div>
+            <div class="step-body">
+              <div class="step-title">Design system & component library</div>
+              <div class="step-desc">Fonts, colors, buttons, cards, badges. Build as reusable CSS/components before any page.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle done">✓</div>
+            <div class="step-body">
+              <div class="step-title">Landing page — all sections</div>
+              <div class="step-desc">Nav, ticker, hero, agents, features, testimonials, pricing, CTA, footer.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle done">✓</div>
+            <div class="step-body">
+              <div class="step-title">Dashboard shell + Agent 1 UI</div>
+              <div class="step-desc">Sidebar, main layout, stat cards, pipeline view, Agent 1 scrape controls and ICP weight editor.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle" style="background:rgba(212,168,83,0.15);border-color:#D4A853;color:#854F0B;">→</div>
+            <div class="step-body">
+              <div class="step-title">Agent 2 UI — SMS outreach sequences</div>
+              <div class="step-desc">Sequence builder: step editor, delay config, AI message generation, per-lead status tracker, outreach stats panel.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">5</div>
+            <div class="step-body">
+              <div class="step-title">Agent 3 UI — conversation & booking</div>
+              <div class="step-desc">Live conversation view, qualification score display, booking confirmation flow, calendar integration UI.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">6</div>
+            <div class="step-body">
+              <div class="step-title">Backend — Google Places API integration</div>
+              <div class="step-desc">API key setup, location+category query builder, results normalisation, ICP scoring engine.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">7</div>
+            <div class="step-body">
+              <div class="step-title">Backend — Twilio SMS + Make.com workflows</div>
+              <div class="step-desc">Send/receive SMS, sequence scheduling, reply detection webhook, GHL trigger setup.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">8</div>
+            <div class="step-body">
+              <div class="step-title">Backend — OpenRouter + Agent 3 AI logic</div>
+              <div class="step-desc">System prompts, conversation history management, qualification scoring logic, calendar booking API calls.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">9</div>
+            <div class="step-body">
+              <div class="step-title">Apollo.io enrichment + GHL full sync</div>
+              <div class="step-desc">Enrich on lead creation, map fields to GHL contact record, trigger GHL automations on stage change.</div>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+
+          <div class="step-item">
+            <div class="step-circle">10</div>
+            <div class="step-body">
+              <div class="step-title">QA, performance, and launch</div>
+              <div class="step-desc">End-to-end pipeline test with real leads. Mobile responsiveness audit. Page speed optimisation. Deploy.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card mt16">
+        <div class="card-title">Developer notes</div>
+        <div class="spec-row"><div class="spec-label">Framework</div><div class="spec-value">No framework specified. HTML/CSS/JS is acceptable for marketing site. React recommended for dashboard if complex state is needed.</div></div>
+        <div class="spec-row"><div class="spec-label">Fonts</div><div class="spec-value">Load from Google Fonts. Preconnect to fonts.googleapis.com and fonts.gstatic.com for performance.</div></div>
+        <div class="spec-row"><div class="spec-label">Animations</div><div class="spec-value">CSS-only for all marketing page animations. No heavy JS animation libraries needed on landing page.</div></div>
+        <div class="spec-row"><div class="spec-label">Mobile</div><div class="spec-value">Hero splits to single column. Agent cards stack. Pricing cards stack (Premium first). Ticker remains horizontal.</div></div>
+        <div class="spec-row"><div class="spec-label">API keys</div><div class="spec-value">Google Places, Twilio, Apollo.io, OpenRouter — all server-side only. Never expose in frontend code.</div></div>
+        <div class="spec-row"><div class="spec-label">Niche config</div><div class="spec-value">All business-type targeting, ICP weights, and location settings must be configurable from the dashboard UI. No hardcoded verticals.</div></div>
+      </div>
+
+      <div class="spec-footer">
+        <p>FlowTerra Build Spec v1.0 — June 2026</p>
+        <p>Generated for developer handoff. Update version number on each revision.</p>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function switchTab(btn, panelId) {
+    document.querySelectorAll('.topbar-nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const panel = document.getElementById('panel-' + panelId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function goTo(panelId, sectionId) {
+    const btns = document.querySelectorAll('.topbar-nav button');
+    const panelOrder = ['overview','design','pages','agents','pricing','integrations','build'];
+    const idx = panelOrder.indexOf(panelId);
+    if (idx >= 0) switchTab(btns[idx], panelId);
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  function selectAgent(block, detailId) {
+    document.querySelectorAll('.agent-block').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.agent-detail').forEach(d => d.classList.remove('visible'));
+    block.classList.add('selected');
+    document.getElementById(detailId).classList.add('visible');
+  }
+
+  function copyHex(swatch, hex) {
+    navigator.clipboard.writeText(hex).catch(() => {});
+    const tip = swatch.querySelector('.copied-tip');
+    tip.classList.add('show');
+    setTimeout(() => tip.classList.remove('show'), 1400);
+  }
+</script>
+</body>
+</html>
