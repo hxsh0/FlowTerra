@@ -11,7 +11,7 @@ export function Footer() {
         <div className="foot-grid">
           <div className="foot-col">
             <a className="brand" href="#top" style={{ marginBottom: 14 }}>
-              <span className="mark" /> FlowTerra
+              <span className="mark" /> StarSource
             </a>
             <p style={{ color: "var(--text-2)", fontSize: 13.5, maxWidth: "34ch", margin: 0 }}>
               The autonomous revenue operating system. Mission control for high-performing sales
@@ -30,7 +30,7 @@ export function Footer() {
           ))}
         </div>
         <div className="foot-bottom">
-          <span>© 2026 FlowTerra Systems, Inc.</span>
+          <span>© 2026 StarSource Systems, Inc.</span>
           <span>SOC 2 Type II · ISO 27001 · GDPR</span>
           <span>v2.4 · build 1180 · all systems operational</span>
         </div>

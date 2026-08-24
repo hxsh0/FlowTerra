@@ -6,23 +6,47 @@ import { DashboardTopbar } from "@/components/dashboard/DashboardTopbar";
 import { AgentScrapeProgress } from "@/components/dashboard/AgentScrapeProgress";
 import { HotLeadsTable } from "@/components/dashboard/HotLeadsTable";
 import { IcpWeightEditor } from "@/components/dashboard/IcpWeightEditor";
-import type { LeadSource } from "@/lib/types";
+import type { DiscoveryResponse, HotLead, LeadSource } from "@/lib/types";
 
 export default function DiscoveryAgentPage() {
   const { niche, mergeDiscoveryLeads } = useDashboard();
   const [source, setSource] = useState<LeadSource>("places");
   const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingLeads, setPendingLeads] = useState<HotLead[]>([]);
+  const [lastRunCount, setLastRunCount] = useState<number | null>(null);
 
   const valid = icpWeightSum(niche.icpCriteria) === 100;
 
-  const onComplete = useCallback(() => {
-    mergeDiscoveryLeads();
+  const onFinished = useCallback(() => {
+    mergeDiscoveryLeads(pendingLeads);
+    setLastRunCount(pendingLeads.length);
     setRunning(false);
-  }, [mergeDiscoveryLeads]);
+    setDone(false);
+  }, [mergeDiscoveryLeads, pendingLeads]);
 
-  const runDiscovery = () => {
+  const runDiscovery = async () => {
     if (!valid || running) return;
     setRunning(true);
+    setDone(false);
+    setError(null);
+    setLastRunCount(null);
+
+    try {
+      const res = await fetch("/api/discovery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ niche, source }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Discovery run failed");
+      setPendingLeads((data as DiscoveryResponse).leads);
+      setDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Discovery run failed");
+      setRunning(false);
+    }
   };
 
   return (
@@ -49,7 +73,7 @@ export default function DiscoveryAgentPage() {
               onClick={() => setSource("scraper")}
             >
               Web scraper
-              <small>Fallback</small>
+              <small>Not yet built</small>
             </button>
           </div>
           <p className="discovery-hint">
@@ -71,7 +95,13 @@ export default function DiscoveryAgentPage() {
                 Run discovery
               </button>
             </div>
-            <AgentScrapeProgress running={running} onComplete={onComplete} />
+            {error && <p className="discovery-error">{error}</p>}
+            {!error && !running && lastRunCount !== null && (
+              <p className="discovery-hint">
+                Last run sourced <strong>{lastRunCount}</strong> lead{lastRunCount === 1 ? "" : "s"}.
+              </p>
+            )}
+            <AgentScrapeProgress running={running} done={done} onFinished={onFinished} />
           </section>
 
           <section className="dash-panel">

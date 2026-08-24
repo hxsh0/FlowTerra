@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { VisualProvider } from "@/lib/visual";
 
 export const metadata: Metadata = {
-  title: "FlowTerra — The Autonomous Revenue OS",
+  title: "StarSource — The Autonomous Revenue OS",
   description:
-    "FlowTerra runs your entire outbound motion with a fleet of autonomous agents — sourcing, researching, engaging, and closing in one continuous loop. Mission control for high-performing sales teams.",
+    "StarSource runs your entire outbound motion with a fleet of autonomous agents — sourcing, researching, engaging, and closing in one continuous loop. Mission control for high-performing sales teams.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

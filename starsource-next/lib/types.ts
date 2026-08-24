@@ -1,5 +1,5 @@
 // ============================================================
-// FlowTerra — domain types
+// StarSource — domain types
 // ============================================================
 
 export type AgentId = "SCOUT" | "PROBE" | "RELAY" | "ECHO" | "LEDGER";
@@ -75,6 +75,12 @@ export interface HotLead {
   source: LeadSource;
   stage: string;
   status: "active" | "won" | "nurture";
+  /** Enrichment fields available for leads sourced from Google Places. */
+  address?: string;
+  website?: string;
+  phone?: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface IcpCriterion {
@@ -88,4 +94,13 @@ export interface NicheConfig {
   location: string;
   radiusKm: number;
   icpCriteria: IcpCriterion[];
+}
+
+export interface DiscoveryRequest {
+  niche: NicheConfig;
+  source: LeadSource;
+}
+
+export interface DiscoveryResponse {
+  leads: HotLead[];
 }

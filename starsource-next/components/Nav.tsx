@@ -24,7 +24,7 @@ export function Nav() {
     <nav className={`nav ${scrolled ? "scrolled" : ""}`} id="nav">
       <div className="wrap-wide">
         <a className="brand" href="#top">
-          <span className="mark" /> FlowTerra
+          <span className="mark" /> StarSource
         </a>
         <div className="nav-links">
           {LINKS.map((l) => (

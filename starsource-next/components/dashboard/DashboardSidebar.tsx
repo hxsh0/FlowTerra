@@ -16,7 +16,7 @@ export function DashboardSidebar() {
     <aside className="dash-sidebar">
       <div className="dash-sidebar-brand">
         <span className="mark" />
-        <span>FlowTerra</span>
+        <span>StarSource</span>
       </div>
       <nav className="dash-nav">
         {NAV.map((item) => {

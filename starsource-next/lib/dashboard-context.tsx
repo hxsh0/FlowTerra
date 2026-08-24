@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { DEFAULT_NICHE, DISCOVERY_SEED_LEADS, HOT_LEADS, pad2 } from "@/lib/data";
+import { DEFAULT_NICHE, HOT_LEADS, pad2 } from "@/lib/data";
 import type { HotLead, LogLine, LogSegment, NicheConfig } from "@/lib/types";
 
 let LOGUID = 1;
@@ -28,7 +28,7 @@ interface DashboardContextValue {
   setNiche: (next: NicheConfig) => void;
   hotLeads: HotLead[];
   addHotLead: (lead: HotLead) => void;
-  mergeDiscoveryLeads: () => void;
+  mergeDiscoveryLeads: (leads: HotLead[]) => void;
   markLeadWon: (company: string) => void;
   nicheModalOpen: boolean;
   setNicheModalOpen: (open: boolean) => void;
@@ -114,10 +114,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const mergeDiscoveryLeads = useCallback(() => {
+  const mergeDiscoveryLeads = useCallback((leads: HotLead[]) => {
     setHotLeads((prev) => {
       const existing = new Set(prev.map((l) => l.company));
-      const fresh = DISCOVERY_SEED_LEADS.filter((l) => !existing.has(l.company));
+      const fresh = leads.filter((l) => !existing.has(l.company));
       return [...fresh, ...prev].slice(0, 20);
     });
   }, []);

@@ -11,7 +11,7 @@ export function Hero() {
           for autonomous revenue.
         </h1>
         <p className="lede">
-          FlowTerra runs your entire outbound motion with a fleet of autonomous agents — sourcing,
+          StarSource runs your entire outbound motion with a fleet of autonomous agents — sourcing,
           researching, engaging, and closing in one continuous loop. You set the strategy. The
           system runs the floor.
         </p>

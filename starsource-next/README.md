@@ -1,7 +1,7 @@
-# FlowTerra — Autonomous Revenue OS
+# StarSource — Autonomous Revenue OS
 
-The marketing site for **FlowTerra**, a fictional autonomous revenue operating
-system. Built with **Next.js (App Router) + TypeScript**, dark-mode first, with a
+The marketing site and dashboard for **StarSource**, an autonomous B2B lead
+generation and outreach platform. Built with **Next.js (App Router) + TypeScript**, dark-mode first, with a
 live "mission control" command center: prospects flow through the pipeline pushed
 by autonomous agents, an activity stream ticks in real time, revenue climbs as
 deals close, and charts redraw frame-by-frame.
@@ -74,9 +74,9 @@ components/
 
 ## How the live data works
 
-There are **no real APIs** — every number is a self-contained client-side
-simulation, so the page is fully static-exportable and has zero backend
-dependencies:
+The landing page's "mission control" section is still a self-contained
+client-side simulation (no backend calls) — every number there is generated
+locally so it's cheap to demo:
 
 - **`Pipeline`** runs the loop. On each tick it either advances a prospect to the
   next stage (with a flying-dot animation + count flash), sources a new one, or
@@ -87,5 +87,8 @@ dependencies:
 - All loops read a `motionRef` so the **Live motion** toggle pauses everything at
   once (and honors users who prefer reduced motion via the CSS `data-motion` hook).
 
-To wire real data, replace the generators in `Pipeline`/`Console` with your CRM
-feed (poll or websocket) and keep the same component props.
+The **dashboard** is a different story: `app/dashboard/agents/discovery` calls a
+real backend route, `app/api/discovery`, which queries the Google Places API and
+scores results against the configured ICP. See `.env.local.example` for the
+required `GOOGLE_PLACES_API_KEY`. Outreach and Booking dashboards are still UI
+shells with mock data — no backend wired up yet.

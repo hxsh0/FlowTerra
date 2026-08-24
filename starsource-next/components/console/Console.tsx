@@ -46,7 +46,7 @@ export function ConsoleFrame({
           <i />
         </div>
         <div className="cons-title">
-          FlowTerra Console <span className="live">LIVE</span>
+          StarSource Console <span className="live">LIVE</span>
         </div>
         <div className="cons-tabs">
           {tabs.map((t) => (

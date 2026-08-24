@@ -49,7 +49,7 @@ export function Features() {
             Engineered for operators, not chatbots.
           </h2>
           <p className="lede">
-            FlowTerra is infrastructure. Deterministic where it counts, autonomous where it pays
+            StarSource is infrastructure. Deterministic where it counts, autonomous where it pays
             off, observable everywhere.
           </p>
         </div>

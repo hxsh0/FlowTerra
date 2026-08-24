@@ -1,8 +1,8 @@
 {
-  "name": "flowterra",
+  "name": "starsource",
   "version": "2.4.0",
   "private": true,
-  "description": "FlowTerra — the autonomous revenue operating system. Mission control for high-performing sales teams.",
+  "description": "StarSource — the autonomous revenue operating system. Mission control for high-performing sales teams.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "next": "^14.2.35",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },

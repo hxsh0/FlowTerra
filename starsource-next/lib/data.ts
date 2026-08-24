@@ -1,5 +1,5 @@
 // ============================================================
-// FlowTerra — shared data + generators
+// StarSource — shared data + generators
 // ============================================================
 import type { Agent, LogSegment, Stage } from "./types";
 
@@ -155,14 +155,6 @@ export const HOT_LEADS = [
   { id: "hl-6", company: "Quanta Systems", icpScore: 82, source: "places" as const, stage: "Sourced", status: "active" as const },
   { id: "hl-7", company: "Beacon Labs", icpScore: 79, source: "scraper" as const, stage: "Sourced", status: "nurture" as const },
   { id: "hl-8", company: "Ironclad Group", icpScore: 76, source: "places" as const, stage: "Won", status: "won" as const },
-];
-
-export const DISCOVERY_SEED_LEADS = [
-  { id: "ds-1", company: "Stratos Cloud", icpScore: 92, source: "places" as const, stage: "Scored", status: "active" as const },
-  { id: "ds-2", company: "Solstice Health", icpScore: 89, source: "places" as const, stage: "Scored", status: "active" as const },
-  { id: "ds-3", company: "Brightline Ops", icpScore: 85, source: "scraper" as const, stage: "Scored", status: "active" as const },
-  { id: "ds-4", company: "Cardinal Logistics", icpScore: 81, source: "scraper" as const, stage: "Scored", status: "active" as const },
-  { id: "ds-5", company: "Tessel Analytics", icpScore: 78, source: "places" as const, stage: "Scored", status: "active" as const },
 ];
 
 export const DASHBOARD_STATS = [
