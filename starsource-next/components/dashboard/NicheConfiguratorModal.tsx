@@ -1,8 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { icpWeightSum } from "@/lib/data";
+import { B2B_INDUSTRIES, icpWeightSum } from "@/lib/data";
 import { useDashboard } from "@/lib/dashboard-context";
-import type { IcpCriterion, NicheConfig } from "@/lib/types";
+import { PlaceAutocompleteField } from "@/components/dashboard/PlaceAutocompleteField";
+import type { IcpCriterion, Jurisdiction, NicheConfig } from "@/lib/types";
+
+const JURISDICTIONS: { id: Jurisdiction; label: string }[] = [
+  { id: "US", label: "United States" },
+  { id: "CA", label: "Canada" },
+  { id: "UK", label: "United Kingdom" },
+];
 
 function cloneNiche(n: NicheConfig): NicheConfig {
   return {
@@ -22,7 +29,7 @@ export function NicheConfiguratorModal() {
   if (!nicheModalOpen) return null;
 
   const sum = icpWeightSum(draft.icpCriteria);
-  const valid = sum === 100;
+  const valid = sum > 0;
 
   const updateCriterion = (id: string, weight: number) => {
     setDraft((d) => ({
@@ -48,17 +55,53 @@ export function NicheConfiguratorModal() {
         </div>
         <div className="niche-form">
           <label>
-            Industry
+            Your business name
             <input
-              value={draft.industry}
-              onChange={(e) => setDraft((d) => ({ ...d, industry: e.target.value }))}
+              value={draft.clientName}
+              onChange={(e) => setDraft((d) => ({ ...d, clientName: e.target.value }))}
             />
           </label>
           <label>
-            Location
+            What you offer prospects
+            <textarea
+              rows={3}
+              value={draft.clientOffer}
+              onChange={(e) => setDraft((d) => ({ ...d, clientOffer: e.target.value }))}
+            />
+          </label>
+          <label>
+            Your Calendly link (optional)
             <input
+              type="url"
+              placeholder="https://calendly.com/your-business/intro-call"
+              value={draft.calendlyLink ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, calendlyLink: e.target.value || undefined }))}
+            />
+          </label>
+          <label>
+            Industry
+            <input
+              list="industry-suggestions"
+              placeholder="Pick a suggestion or type your own"
+              value={draft.industry}
+              onChange={(e) => setDraft((d) => ({ ...d, industry: e.target.value }))}
+            />
+            <datalist id="industry-suggestions">
+              {B2B_INDUSTRIES.map((group) => (
+                <optgroup key={group.sector} label={group.sector}>
+                  {group.industries.map((ind) => (
+                    <option key={ind} value={ind} />
+                  ))}
+                </optgroup>
+              ))}
+            </datalist>
+          </label>
+          <label>
+            Location
+            <PlaceAutocompleteField
               value={draft.location}
-              onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))}
+              onChange={(location) => setDraft((d) => ({ ...d, location }))}
+              placeholder="City, region, or address"
             />
           </label>
           <label>
@@ -71,11 +114,31 @@ export function NicheConfiguratorModal() {
               onChange={(e) => setDraft((d) => ({ ...d, radiusKm: Number(e.target.value) || 0 }))}
             />
           </label>
+          <label>
+            Market
+            <select
+              value={draft.jurisdiction}
+              onChange={(e) => setDraft((d) => ({ ...d, jurisdiction: e.target.value as Jurisdiction }))}
+            >
+              {JURISDICTIONS.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
+        <p className="discovery-hint">
+          Outreach eligibility per channel is computed against this market's rules
+          (CASL in Canada, PECR/UK GDPR in the UK, CAN-SPAM/TCPA in the US) — not legal advice, verify with counsel.
+        </p>
         <div className="niche-icp">
           <div className="niche-icp-head">
             <h3>ICP scoring weights</h3>
-            <span className={valid ? "icp-sum ok" : "icp-sum err"}>Total: {sum}%</span>
+            <span className={valid ? "icp-sum ok" : "icp-sum err"}>
+              Relative weights: {sum}
+              {!valid && " — set at least one above zero"}
+            </span>
           </div>
           {draft.icpCriteria.map((c: IcpCriterion) => (
             <div className="icp-row" key={c.id}>

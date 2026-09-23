@@ -25,3 +25,6 @@ next-env.d.ts
 
 # env
 .env*.local
+
+# local outreach persistence (suppression list, send log) — contains PII
+/.data

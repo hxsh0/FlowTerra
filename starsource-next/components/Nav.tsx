@@ -3,11 +3,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const LINKS = [
-  { href: "#console", label: "Console" },
-  { href: "#agents", label: "Agents" },
-  { href: "#pipeline", label: "Pipeline" },
-  { href: "#system", label: "System" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#channels", label: "Channels" },
+  { href: "#guarantee", label: "Guarantee" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 export function Nav() {
@@ -34,15 +33,11 @@ export function Nav() {
           ))}
         </div>
         <div className="nav-right">
-          <span className="nav-ver">v2.4 · build 1180</span>
-          <Link className="btn btn-ghost btn-sm" href="/dashboard">
+          <Link className="btn btn-ghost btn-sm" href="/login">
             Sign in
           </Link>
-          <Link className="btn btn-primary btn-sm" href="/dashboard">
-            Launch console{" "}
-            <span className="kbd" style={{ borderColor: "rgba(0,0,0,.25)", color: "#3a2a18" }}>
-              ⌘K
-            </span>
+          <Link className="btn btn-primary btn-sm" href="/scan">
+            Get a free market scan
           </Link>
         </div>
       </div>

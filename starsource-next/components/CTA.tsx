@@ -2,26 +2,19 @@ import { Reveal } from "@/components/Reveal";
 
 export function CTA() {
   return (
-    <section className="section" id="pricing" style={{ paddingTop: 0 }}>
+    <section className="section" style={{ paddingTop: 0 }}>
       <div className="wrap">
         <Reveal className="cta">
-          <div className="cta-grid-bg" />
-          <span className="eyebrow" style={{ display: "flex", justifyContent: "center" }}>
-            Deploy the fleet
-          </span>
-          <h2 className="h2" style={{ marginTop: 18 }}>
-            Put your pipeline on autopilot.
+          <h2 className="h2">
+            See what&rsquo;s moving in <em className="accent-em">your market</em> tonight.
           </h2>
           <p className="lede">
-            Onboard in a day. Watch the first agents start working your accounts before you finish
-            your coffee.
+            A free market scan shows you the live signals in your area — before you spend a
+            dollar.
           </p>
           <div className="hero-cta">
-            <a className="btn btn-primary" href="#">
-              Request access
-            </a>
-            <a className="btn btn-ghost" href="#">
-              Talk to engineering
+            <a className="btn btn-primary" href="/scan">
+              Get a free market scan
             </a>
           </div>
         </Reveal>

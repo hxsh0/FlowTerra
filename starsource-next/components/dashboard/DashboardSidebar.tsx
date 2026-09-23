@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 const NAV = [
   { href: "/dashboard", label: "Overview", exact: true },
   { href: "/dashboard/agents/discovery", label: "Agent 1 — Discovery" },
-  { href: "/dashboard/agents/outreach", label: "Agent 2 — Outreach", disabled: true },
-  { href: "/dashboard/agents/booking", label: "Agent 3 — Booking", premium: true, disabled: true },
+  { href: "/dashboard/agents/outreach", label: "Agent 2 — Outreach" },
+  { href: "/dashboard/agents/booking", label: "Agent 3 — Booking" },
+  { href: "/dashboard/contracts", label: "Contracts" },
+  { href: "/dashboard/admin", label: "Admin — API Usage" },
 ];
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ email }: { email?: string }) {
   const pathname = usePathname();
 
   return (
@@ -21,14 +23,6 @@ export function DashboardSidebar() {
       <nav className="dash-nav">
         {NAV.map((item) => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-          if (item.disabled) {
-            return (
-              <span key={item.href} className="dash-nav-link disabled">
-                {item.label}
-                {item.premium && <span className="dash-pill">Premium</span>}
-              </span>
-            );
-          }
           return (
             <Link
               key={item.href}
@@ -41,7 +35,13 @@ export function DashboardSidebar() {
         })}
       </nav>
       <div className="dash-sidebar-foot">
+        {email && <span className="dash-session-email" title={email}>{email}</span>}
         <span className="dash-nav-link disabled">Settings</span>
+        <form action="/api/auth/logout" method="POST">
+          <button type="submit" className="dash-nav-link dash-signout">
+            Sign out
+          </button>
+        </form>
         <Link href="/" className="dash-back">
           ← Marketing site
         </Link>

@@ -92,3 +92,11 @@ real backend route, `app/api/discovery`, which queries the Google Places API and
 scores results against the configured ICP. See `.env.local.example` for the
 required `GOOGLE_PLACES_API_KEY`. Outreach and Booking dashboards are still UI
 shells with mock data — no backend wired up yet.
+
+The Discovery dashboard's leads map (`components/dashboard/LeadsMap.tsx`) and
+the niche configurator's location field (`components/dashboard/PlaceAutocompleteField.tsx`)
+run client-side on the Google Maps JavaScript API and the Places API (New)
+Autocomplete Data API, via `lib/google-maps-loader.ts`. These need a separate,
+browser-exposed `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (see `.env.local.example`) with
+"Maps JavaScript API" and "Places API" enabled — restrict it to your domain(s)
+in Google Cloud Console since it ships to the client.

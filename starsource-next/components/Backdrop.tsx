@@ -1,8 +1,10 @@
+import { Starfield } from "@/components/Starfield";
+
 export function Backdrop() {
   return (
     <>
-      <div className="bg-field" aria-hidden="true" />
-      <div className="bg-noise" aria-hidden="true" />
+      <div className="bg-glow" aria-hidden="true" />
+      <Starfield />
     </>
   );
 }

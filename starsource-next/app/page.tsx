@@ -1,11 +1,11 @@
 import { Backdrop } from "@/components/Backdrop";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
-import { Console } from "@/components/console/Console";
-import { StatLine } from "@/components/StatLine";
-import { AgentsWorkflow } from "@/components/AgentsWorkflow";
-import { DataViz } from "@/components/viz/DataViz";
-import { Features } from "@/components/Features";
+import { ProblemSection } from "@/components/ProblemSection";
+import { ConstellationSection } from "@/components/ConstellationSection";
+import { ChannelsSection } from "@/components/ChannelsSection";
+import { GuaranteeSection } from "@/components/GuaranteeSection";
+import { FaqSection } from "@/components/FaqSection";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 
@@ -16,13 +16,11 @@ export default function Home() {
       <Nav />
       <main id="top">
         <Hero />
-        <Console />
-        <StatLine />
-        <AgentsWorkflow />
-        <hr className="divider" />
-        <DataViz />
-        <hr className="divider" />
-        <Features />
+        <ProblemSection />
+        <ConstellationSection />
+        <ChannelsSection />
+        <GuaranteeSection />
+        <FaqSection />
         <CTA />
         <Footer />
       </main>

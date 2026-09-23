@@ -5,7 +5,7 @@ import { useDashboard } from "@/lib/dashboard-context";
 export function IcpWeightEditor() {
   const { niche, setNiche } = useDashboard();
   const sum = icpWeightSum(niche.icpCriteria);
-  const valid = sum === 100;
+  const valid = sum > 0;
 
   const updateWeight = (id: string, weight: number) => {
     setNiche({
@@ -18,7 +18,10 @@ export function IcpWeightEditor() {
     <div className="icp-editor">
       <div className="icp-editor-head">
         <h3>ICP criteria</h3>
-        <span className={valid ? "icp-sum ok" : "icp-sum err"}>Total: {sum}%</span>
+        <span className={valid ? "icp-sum ok" : "icp-sum err"}>
+          Relative weights: {sum}
+          {!valid && " — set at least one above zero"}
+        </span>
       </div>
       {niche.icpCriteria.map((c) => (
         <div className="icp-row" key={c.id}>
@@ -41,7 +44,7 @@ export function IcpWeightEditor() {
         </div>
       ))}
       {!valid && (
-        <p className="icp-hint">Weights must sum to exactly 100% before running discovery.</p>
+        <p className="icp-hint">At least one criterion needs a weight above zero to score leads.</p>
       )}
     </div>
   );

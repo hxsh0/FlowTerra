@@ -2,35 +2,28 @@ export function Hero() {
   return (
     <header className="hero">
       <div className="wrap">
-        <span className="badge">
-          <span className="tag">LIVE</span> <b>5 agents</b>&nbsp;working <b>312</b>&nbsp;accounts now
+        <span className="eyebrow" style={{ display: "inline-flex", justifyContent: "center" }}>
+          Done-for-you client acquisition
         </span>
-        <h1>
-          The operating system
+        <h1 style={{ marginTop: 22 }}>
+          Stop cold-calling the dark.
           <br />
-          for autonomous revenue.
+          <em className="accent-em">Navigate by signal.</em>
         </h1>
-        <p className="lede">
-          StarSource runs your entire outbound motion with a fleet of autonomous agents — sourcing,
-          researching, engaging, and closing in one continuous loop. You set the strategy. The
-          system runs the floor.
+        <p className="lede" style={{ margin: "0 auto 32px" }}>
+          StarSource watches your local market for live evidence of need — rebrands, hiring,
+          review shifts — and books meetings on your calendar only when the signals say a
+          business is worth your time.
         </p>
         <div className="hero-cta">
-          <a className="btn btn-primary" href="#">
-            Request access
+          <a className="btn btn-primary" href="/scan">
+            Get a free market scan
           </a>
-          <a className="btn btn-ghost" href="#console">
-            See it run <span style={{ opacity: 0.6 }}>↓</span>
+          <a className="btn btn-ghost" href="#how-it-works">
+            See how it works
           </a>
         </div>
-        <div className="hero-meta">
-          <span>
-            <i className="dot" /> All systems operational
-          </span>
-          <span>SOC 2 Type II</span>
-          <span>99.98% uptime</span>
-          <span>Deployed in 1,200+ pipelines</span>
-        </div>
+        <p className="hero-note">See the signals filling in your area right now. No commitment.</p>
       </div>
     </header>
   );

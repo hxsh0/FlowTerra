@@ -52,15 +52,22 @@ function subScore(criterionId: string, c: ScoreCandidate, locationQuery: string,
   }
 }
 
-/** Weighted ICP score, 0-100, rounded. `criteria` weights must sum to 100. */
+/**
+ * Weighted ICP score, 0-100, rounded. Weights are normalized against
+ * their own sum, so they can be set in any relative proportion — they
+ * don't need to add up to exactly 100.
+ */
 export function scoreCandidate(
   candidate: ScoreCandidate,
   criteria: IcpCriterion[],
   locationQuery: string,
   industryQuery: string
 ): number {
+  const weightSum = criteria.reduce((sum, c) => sum + c.weight, 0);
+  if (weightSum <= 0) return NO_SIGNAL_SCORE;
+
   const total = criteria.reduce(
-    (sum, c) => sum + (subScore(c.id, candidate, locationQuery, industryQuery) * c.weight) / 100,
+    (sum, c) => sum + (subScore(c.id, candidate, locationQuery, industryQuery) * c.weight) / weightSum,
     0
   );
   return Math.max(0, Math.min(100, Math.round(total)));
