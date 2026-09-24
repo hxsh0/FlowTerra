@@ -40,7 +40,14 @@ export async function sendEmailViaResend(input: SendEmailInput): Promise<SendEma
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Resend request failed (${res.status}): ${body.slice(0, 300)}`);
+    let detail = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body) as { message?: string; name?: string };
+      if (parsed.message) detail = parsed.message;
+    } catch {
+      // keep raw body
+    }
+    throw new Error(`Resend request failed (${res.status}): ${detail}`);
   }
 
   // $0 while under Resend's free-tier volume — flagged as an estimate since

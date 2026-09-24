@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { appBaseUrl, outreachFromEmail } from "@/lib/app-url";
 import { evaluateChannel } from "@/lib/consent";
 import { sendEmailViaResend, withUnsubscribeFooter } from "@/lib/email";
 import { countSendsSince, isSuppressed, recordSend, sentToRecently } from "@/lib/outreach-store";
@@ -67,13 +68,14 @@ export async function POST(req: Request) {
     );
   }
 
-  const fromEmail = process.env.OUTREACH_FROM_EMAIL;
-  const baseUrl = process.env.APP_BASE_URL;
-  if (!fromEmail || !baseUrl) {
-    return respond(
-      { status: "error", reason: "OUTREACH_FROM_EMAIL and APP_BASE_URL must be configured on the server." },
-      500
-    );
+  let fromEmail: string;
+  let baseUrl: string;
+  try {
+    fromEmail = outreachFromEmail();
+    baseUrl = appBaseUrl(req);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Email is not configured on the server.";
+    return respond({ status: "error", reason: message }, 500);
   }
 
   const html = withUnsubscribeFooter(bodyHtml, lead.email, baseUrl);
